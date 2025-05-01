@@ -11,28 +11,26 @@
       text-align: center;
       padding-top: 50px;
     }
-    .wheel-container {
-      position: relative;
-      width: 400px;
-      height: 400px;
-      margin: auto;
-    }
-    .wheel-img {
-      width: 100%;
-      height: 100%;
+    canvas {
       border-radius: 50%;
       border: 10px solid #ff9800;
-      transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
+      background-color: #111;
     }
     .pointer {
-      width: 0; 
-      height: 0; 
+      width: 0;
+      height: 0;
       border-left: 20px solid transparent;
       border-right: 20px solid transparent;
       border-bottom: 40px solid #ff9800;
       position: absolute;
       top: -40px;
       left: calc(50% - 20px);
+    }
+    .wheel-container {
+      position: relative;
+      width: 400px;
+      height: 400px;
+      margin: auto;
     }
     #spin {
       background: #ff9800;
@@ -63,46 +61,105 @@
 <body>
   <div class="wheel-container">
     <div class="pointer"></div>
-    <img id="wheel" class="wheel-img" src="https://raw.githubusercontent.com/mosifantastic/buy-config-v2ray/main/assets/wheel.png" alt="گردونه شانس">
+    <canvas id="wheel" width="400" height="400"></canvas>
   </div>
   <button id="spin">بچرخ!</button>
   <div id="codeBox"></div>
   <button id="copyCode">کپی کد</button>
 
+  <audio id="tickSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_d35d5a11de.mp3?filename=click-124467.mp3"></audio>
+
   <script>
     const options = [
-      { label: "تخفیف 6٪", code: "9771" },
-      { label: "تخفیف 8٪", code: "5706" },
-      { label: "تخفیف 15٪", code: "8289" },
-      { label: "تخفیف 25٪", code: "6581" },
-      { label: "تخفیف 30٪", code: "2276" },
-      { label: "تخفیف 45٪", code: "4711" },
-      { label: "پوچ", code: "--" }
+      { label: "تخفیف 6٪", code: "9771", color: "#ff9800" },
+      { label: "تخفیف 8٪", code: "5706", color: "#4caf50" },
+      { label: "تخفیف 15٪", code: "8289", color: "#2196f3" },
+      { label: "تخفیف 25٪", code: "6581", color: "#f44336" },
+      { label: "تخفیف 30٪", code: "2276", color: "#9c27b0" },
+      { label: "تخفیف 45٪", code: "4711", color: "#00bcd4" },
+      { label: "پوچ", code: "--", color: "#777" }
     ];
 
-    const wheel = document.getElementById("wheel");
+    const canvas = document.getElementById("wheel");
+    const ctx = canvas.getContext("2d");
+    const radius = canvas.width / 2;
     const spinBtn = document.getElementById("spin");
     const codeBox = document.getElementById("codeBox");
     const copyBtn = document.getElementById("copyCode");
+    const tickSound = document.getElementById("tickSound");
 
-    let deg = 0;
+    let angle = 0;
+    let spinning = false;
+    let lastSegment = -1;
 
-    spinBtn.addEventListener("click", () => {
-      const segmentAngle = 360 / options.length;
-      const randomSegment = Math.floor(Math.random() * options.length);
-      const spins = Math.floor(Math.random() * 4) + 5;
-      const totalDeg = spins * 360 + (randomSegment * segmentAngle) + (segmentAngle / 2);
-      deg += totalDeg;
-      wheel.style.transform = `rotate(${deg}deg)`;
+    function drawWheel() {
+      const anglePerSlice = 2 * Math.PI / options.length;
+      for (let i = 0; i < options.length; i++) {
+        const startAngle = i * anglePerSlice;
+        const endAngle = startAngle + anglePerSlice;
 
-      setTimeout(() => {
-        const index = options.length - 1 - randomSegment;
-        const result = options[index];
-        codeBox.textContent = result.code !== "--" ? `کد تخفیف شما: ${result.code}` : "متاسفم! پوچ بود :(";
-        copyBtn.style.display = result.code !== "--" ? "inline-block" : "none";
-        copyBtn.onclick = () => navigator.clipboard.writeText(result.code);
-      }, 5200);
-    });
+        ctx.beginPath();
+        ctx.moveTo(radius, radius);
+        ctx.arc(radius, radius, radius, startAngle, endAngle);
+        ctx.fillStyle = options[i].color;
+        ctx.fill();
+
+        ctx.save();
+        ctx.translate(radius, radius);
+        ctx.rotate(startAngle + anglePerSlice / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 16px sans-serif";
+        ctx.fillText(options[i].label, radius - 10, 5);
+        ctx.restore();
+      }
+    }
+
+    function spinWheel() {
+      if (spinning) return;
+      spinning = true;
+      const spins = Math.random() * 5 + 5;
+      const totalAngle = spins * 360;
+      const duration = 5000;
+      const start = performance.now();
+
+      function animate(time) {
+        const progress = Math.min((time - start) / duration, 1);
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        angle = easeOut * totalAngle;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.save();
+        ctx.translate(radius, radius);
+        ctx.rotate(angle * Math.PI / 180);
+        ctx.translate(-radius, -radius);
+        drawWheel();
+        ctx.restore();
+
+        const degrees = angle % 360;
+        const segment = Math.floor((360 - degrees + (360 / options.length / 2)) % 360 / (360 / options.length));
+        if (segment !== lastSegment) {
+          tickSound.currentTime = 0;
+          tickSound.play();
+          lastSegment = segment;
+        }
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          const result = options[segment];
+          codeBox.textContent = result.code !== "--" ? `کد تخفیف شما: ${result.code}` : "متاسفم! پوچ بود :(";
+          copyBtn.style.display = result.code !== "--" ? "inline-block" : "none";
+          copyBtn.onclick = () => navigator.clipboard.writeText(result.code);
+          spinning = false;
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    drawWheel();
+    spinBtn.addEventListener("click", spinWheel);
   </script>
 </body>
 </html>
