@@ -1,133 +1,117 @@
 <!DOCTYPE html>
 <html lang="fa">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>چرخ شانس VIVA DIVA</title>
+  <meta charset="UTF-8">
+  <title>چرخ شانس VIVA DIVA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Vazirmatn', sans-serif;
+      text-align: center;
+      background: linear-gradient(to bottom, #111, #333);
+      color: #fff;
+      margin: 0;
+      padding: 40px;
+    }
 
-    <!-- فونت وزیر از گوگل -->
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn&display=swap" rel="stylesheet">
+    h1 {
+      font-size: 32px;
+      margin-bottom: 30px;
+    }
 
-    <style>
-        body {
-            font-family: 'Vazirmatn', sans-serif;
-            text-align: center;
-            margin-top: 50px;
-            background-color: #f4f4f4;
-            direction: rtl; /* جهت راست به چپ */
-        }
+    .container {
+      position: relative;
+      width: 300px;
+      margin: 0 auto;
+    }
 
-        .wheel-container {
-            position: relative;
-            margin: 0 auto;
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            border: 10px solid #ff9800;
-            background: conic-gradient(#ff9800 0% 16%, #4caf50 16% 32%, #2196f3 32% 48%, #f44336 48% 64%, #9c27b0 64% 80%, #ffc107 80% 100%);
-            transition: transform 4s ease-out;
-        }
+    .wheel-container {
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      border: 10px solid #ff9800;
+      background: conic-gradient(#ff9800 0% 16.6%, #4caf50 16.6% 33.2%, #2196f3 33.2% 49.8%, #f44336 49.8% 66.4%, #9c27b0 66.4% 83%, #ffc107 83% 100%);
+      transition: transform 4s cubic-bezier(0.25, 1.5, 0.5, 1);
+      box-shadow: 0 0 20px rgba(255, 152, 0, 0.5);
+    }
 
-        .wheel {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 50px;
-            height: 50px;
-            background-color: #ff9800;
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            cursor: pointer;
-        }
+    .pointer {
+      position: absolute;
+      top: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 18px solid transparent;
+      border-right: 18px solid transparent;
+      border-bottom: 35px solid #ff3d00;
+      z-index: 10;
+    }
 
-        .reward {
-            margin-top: 20px;
-            font-size: 24px;
-            color: green;
-            font-weight: bold;
-        }
+    .wheel {
+      cursor: pointer;
+      margin-top: 30px;
+      background: linear-gradient(to right, #ff5722, #e91e63);
+      padding: 15px 30px;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: background 0.3s ease;
+    }
 
-        .message {
-            margin-top: 10px;
-            font-size: 18px;
-            color: #333;
-        }
+    .wheel:hover {
+      background: linear-gradient(to right, #e91e63, #ff5722);
+    }
 
-        .disabled {
-            background-color: #9e9e9e;
-            cursor: not-allowed;
-        }
-
-        h1 {
-            font-size: 30px;
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        .content {
-            font-size: 18px;
-            color: #555;
-            margin: 20px;
-            line-height: 1.6;
-        }
-
-        .content span {
-            color: #ff9800;
-        }
-    </style>
+    .reward {
+      margin-top: 40px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #00e676;
+    }
+  </style>
 </head>
 <body>
+  <h1>بچرخون و جایزه ببر 🎁</h1>
+  <div class="container">
+    <div class="pointer"></div>
+    <div class="wheel-container" id="wheel"></div>
+  </div>
+  <button class="wheel" onclick="spinWheel()">بچرخون!</button>
+  <div id="reward" class="reward"></div>
 
-    <h1>چرخ شانس VIVA DIVA</h1>
-    <p>شانس خودتو امتحان کن و بهترین تخفیف‌ها رو بگیر!</p>
+  <script>
+    const wheel = document.getElementById('wheel');
+    const rewardText = document.getElementById('reward');
+    let isSpinning = false;
+    const rewards = [
+      "10% تخفیف",
+      "20% تخفیف",
+      "30% تخفیف",
+      "50% تخفیف",
+      "کد رایگان",
+      "هیچی! دوباره تلاش کن!"
+    ];
 
-    <div class="wheel-container" id="wheel-container">
-        <div class="wheel" id="wheel" onclick="spinWheel()"></div>
-    </div>
+    function spinWheel() {
+      if (isSpinning) return;
+      isSpinning = true;
 
-    <div id="reward" class="reward"></div>
-    <div id="message" class="message"></div>
+      const sectionAngle = 360 / rewards.length;
+      const randIndex = Math.floor(Math.random() * rewards.length);
+      const extraSpins = 6; // چرخش زیادتر برای جذابیت
+      const rotation = (extraSpins * 360) + (randIndex * sectionAngle) + (sectionAngle / 2);
 
-    <div class="content">
-        <p>
-            <span>VIVA DIVA</span> یک فرصت استثنائی برای کسانی است که می‌خواهند از مرزها عبور کنند و از قدرت اینترنت با سرعتی شگفت‌انگیز بهره ببرند. 
-            اینجا نه تنها یک سرویس است، بلکه یک تجربه است. تجربه‌ای که در آن محدودیت‌ها بی‌معنی‌اند و تنها سرعت و کیفیت اهمیت دارند. 
-            پس فرصت رو از دست نده و امروز چرخ بزن تا جایزه خودتو بگیری.
-        </p>
-        <p>
-            این تنها یک چرخ شانس نیست؛ این یک آزمون است برای کسانی که می‌خواهند بهترین تجربه‌ها رو در دنیای دیجیتال داشته باشند. 
-            هر روز یک شانس جدید برای تغییر زندگی دیجیتالی شماست.
-        </p>
-        <p>
-            اینجا جاییه که تصمیمات بزرگ گرفته می‌شوند و شما هم می‌توانید بخشی از این تغییر باشید. 
-            پس چرا منتظری؟ همین حالا شروع کن و یه قدم جلوتر از بقیه باش.
-        </p>
-    </div>
+      wheel.style.transform = `rotate(${rotation}deg)`;
 
-    <script>
-        function spinWheel() {
-            // چرخاندن چرخ (چرخش تصادفی)
-            const randomDegree = Math.floor(Math.random() * 360) + 720; // حداقل دو بار چرخش
-            const rewards = [
-                "10% تخفیف",
-                "20% تخفیف",
-                "30% تخفیف",
-                "50% تخفیف",
-                "کد رایگان برای خرید بعدی",
-                "هیچ‌چیزی! دوباره تلاش کن!"
-            ];
-
-            const randomReward = rewards[Math.floor(Math.random() * rewards.length)];
-
-            // اعمال چرخش به چرخ شانس
-            document.getElementById('wheel-container').style.transform = `rotate(${randomDegree}deg)`;
-
-            // نمایش جایزه به کاربر
-            setTimeout(function() {
-                document.getElementById('reward').innerHTML = `جایزه شما: ${randomReward}`;
-            }, 4000); // بعد از 4 ثانیه که چرخش تموم شد، جایزه نمایش داده می‌شود
-        }
-    </script>
-
+      setTimeout(() => {
+        rewardText.textContent = `🎁 جایزه‌ات: ${rewards[randIndex]}`;
+        isSpinning = false;
+      }, 4200);
+    }
+  </script>
 </body>
 </html>
