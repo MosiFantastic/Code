@@ -128,9 +128,7 @@
       { label: "تخفیف 15٪", code: "8289", color: "#2196f3" },
       { label: "تخفیف 25٪", code: "6581", color: "#f44336" },
       { label: "تخفیف 30٪", code: "2276", color: "#9c27b0" },
-      { label: "تخفیف 45٪", code: "4711", color: "#00bcd4" },
-      { label: "پوچ", code: null, color: "#ffc107" },
-      { label: "پوچ", code: null, color: "#795548" }
+      { label: "تخفیف 45٪", code: "4711", color: "#00bcd4" }
     ]);
 
     let isSpinning = false;
@@ -175,12 +173,8 @@
 
       setTimeout(() => {
         const reward = rewards[randIndex];
-        if (reward.code) {
-          rewardText.textContent = `🎉 تبریک! شما ${reward.label} برنده شدید.`;
-          copyContainer.innerHTML = `<p>کد تخفیف شما: <b>${reward.code}</b></p><button class='copy-btn' onclick='copyCode("${reward.code}")'>کپی کد</button>`;
-        } else {
-          rewardText.textContent = `😢 متاسفیم! ${reward.label}`;
-        }
+        rewardText.textContent = `🎉 تبریک! شما ${reward.label} برنده شدید.`;
+        copyContainer.innerHTML = `<p>کد تخفیف شما: <b>${reward.code}</b></p><button class='copy-btn' onclick='copyCode("${reward.code}")'>کپی کد</button>`;
         isSpinning = false;
       }, 4200);
     }
