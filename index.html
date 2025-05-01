@@ -26,13 +26,35 @@
     }
 
     .wheel-container {
+      position: relative;
       width: 300px;
       height: 300px;
       border-radius: 50%;
       border: 10px solid #ff9800;
-      background: conic-gradient(#ff9800 0% 16.6%, #4caf50 16.6% 33.2%, #2196f3 33.2% 49.8%, #f44336 49.8% 66.4%, #9c27b0 66.4% 83%, #ffc107 83% 100%);
+      overflow: hidden;
       transition: transform 4s cubic-bezier(0.25, 1.5, 0.5, 1);
       box-shadow: 0 0 20px rgba(255, 152, 0, 0.5);
+    }
+
+    .wheel-section {
+      position: absolute;
+      width: 50%;
+      height: 50%;
+      top: 50%;
+      left: 50%;
+      transform-origin: 0% 0%;
+      background-color: transparent;
+    }
+
+    .wheel-text {
+      position: absolute;
+      left: 100%;
+      top: 50%;
+      transform: translate(-50%, -50%) rotate(60deg);
+      transform-origin: left center;
+      white-space: nowrap;
+      font-size: 14px;
+      font-weight: bold;
     }
 
     .pointer {
@@ -48,7 +70,7 @@
       z-index: 10;
     }
 
-    .wheel {
+    .wheel-button {
       cursor: pointer;
       margin-top: 30px;
       background: linear-gradient(to right, #ff5722, #e91e63);
@@ -62,7 +84,7 @@
       transition: background 0.3s ease;
     }
 
-    .wheel:hover {
+    .wheel-button:hover {
       background: linear-gradient(to right, #e91e63, #ff5722);
     }
 
@@ -80,21 +102,42 @@
     <div class="pointer"></div>
     <div class="wheel-container" id="wheel"></div>
   </div>
-  <button class="wheel" onclick="spinWheel()">بچرخون!</button>
+  <button class="wheel-button" onclick="spinWheel()">بچرخون!</button>
   <div id="reward" class="reward"></div>
 
   <script>
     const wheel = document.getElementById('wheel');
     const rewardText = document.getElementById('reward');
-    let isSpinning = false;
     const rewards = [
-      "10% تخفیف",
-      "20% تخفیف",
-      "30% تخفیف",
-      "50% تخفیف",
-      "کد رایگان",
-      "هیچی! دوباره تلاش کن!"
+      { label: "6% تخفیف", code: "9771", color: "#ff9800" },
+      { label: "8% تخفیف", code: "5706", color: "#4caf50" },
+      { label: "15% تخفیف", code: "8289", color: "#2196f3" },
+      { label: "25% تخفیف", code: "6581", color: "#f44336" },
+      { label: "30% تخفیف", code: "2276", color: "#9c27b0" },
+      { label: "45% تخفیف", code: "4711", color: "#00bcd4" },
+      { label: "پوچ", code: null, color: "#ffc107" },
+      { label: "پوچ", code: null, color: "#795548" }
     ];
+
+    let isSpinning = false;
+
+    function buildWheel() {
+      const angle = 360 / rewards.length;
+      rewards.forEach((reward, i) => {
+        const section = document.createElement('div');
+        section.className = 'wheel-section';
+        section.style.transform = `rotate(${i * angle}deg)`;
+        section.style.background = reward.color;
+
+        const text = document.createElement('div');
+        text.className = 'wheel-text';
+        text.textContent = reward.label;
+        text.style.transform = `translate(-50%, -50%) rotate(${angle / 2}deg)`;
+
+        section.appendChild(text);
+        wheel.appendChild(section);
+      });
+    }
 
     function spinWheel() {
       if (isSpinning) return;
@@ -102,16 +145,24 @@
 
       const sectionAngle = 360 / rewards.length;
       const randIndex = Math.floor(Math.random() * rewards.length);
-      const extraSpins = 6; // چرخش زیادتر برای جذابیت
+      const extraSpins = 6;
       const rotation = (extraSpins * 360) + (randIndex * sectionAngle) + (sectionAngle / 2);
 
+      wheel.style.transition = 'transform 4s cubic-bezier(0.25, 1.5, 0.5, 1)';
       wheel.style.transform = `rotate(${rotation}deg)`;
 
       setTimeout(() => {
-        rewardText.textContent = `🎁 جایزه‌ات: ${rewards[randIndex]}`;
+        const reward = rewards[randIndex];
+        if (reward.code) {
+          rewardText.textContent = `🎉 تبریک! ${reward.label} | کد تخفیف: ${reward.code}`;
+        } else {
+          rewardText.textContent = `😢 متاسفیم! ${reward.label}`;
+        }
         isSpinning = false;
       }, 4200);
     }
+
+    buildWheel();
   </script>
 </body>
 </html>
