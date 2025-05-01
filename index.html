@@ -17,12 +17,11 @@
       height: 400px;
       margin: auto;
     }
-    .wheel {
+    .wheel-img {
       width: 100%;
       height: 100%;
       border-radius: 50%;
       border: 10px solid #ff9800;
-      position: relative;
       transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
     }
     .pointer {
@@ -64,7 +63,7 @@
 <body>
   <div class="wheel-container">
     <div class="pointer"></div>
-    <canvas id="wheel" class="wheel"></canvas>
+    <img id="wheel" class="wheel-img" src="https://raw.githubusercontent.com/mosifantastic/buy-config-v2ray/main/assets/wheel.png" alt="گردونه شانس">
   </div>
   <button id="spin">بچرخ!</button>
   <div id="codeBox"></div>
@@ -72,50 +71,29 @@
 
   <script>
     const options = [
-      { label: "تخفیف 6٪", code: "9771", color: "#ff9800" },
-      { label: "تخفیف 8٪", code: "5706", color: "#4caf50" },
-      { label: "تخفیف 15٪", code: "8289", color: "#2196f3" },
-      { label: "تخفیف 25٪", code: "6581", color: "#f44336" },
-      { label: "تخفیف 30٪", code: "2276", color: "#9c27b0" },
-      { label: "تخفیف 45٪", code: "4711", color: "#00bcd4" },
-      { label: "پوچ", code: "--", color: "#333" }
+      { label: "تخفیف 6٪", code: "9771" },
+      { label: "تخفیف 8٪", code: "5706" },
+      { label: "تخفیف 15٪", code: "8289" },
+      { label: "تخفیف 25٪", code: "6581" },
+      { label: "تخفیف 30٪", code: "2276" },
+      { label: "تخفیف 45٪", code: "4711" },
+      { label: "پوچ", code: "--" }
     ];
 
     const wheel = document.getElementById("wheel");
-    const ctx = wheel.getContext("2d");
     const spinBtn = document.getElementById("spin");
     const codeBox = document.getElementById("codeBox");
     const copyBtn = document.getElementById("copyCode");
 
-    const segmentAngle = 2 * Math.PI / options.length;
-    let rotation = 0;
+    let deg = 0;
 
-    function drawWheel() {
-      for (let i = 0; i < options.length; i++) {
-        const angle = i * segmentAngle;
-        ctx.beginPath();
-        ctx.moveTo(200, 200);
-        ctx.arc(200, 200, 200, angle, angle + segmentAngle);
-        ctx.fillStyle = options[i].color;
-        ctx.fill();
-        ctx.save();
-        ctx.translate(200, 200);
-        ctx.rotate(angle + segmentAngle / 2);
-        ctx.textAlign = "right";
-        ctx.fillStyle = "#fff";
-        ctx.font = "bold 16px sans-serif";
-        ctx.fillText(options[i].label, 180, 5);
-        ctx.restore();
-      }
-    }
-
-    function spinWheel() {
-      const spins = Math.floor(Math.random() * 4) + 5;
+    spinBtn.addEventListener("click", () => {
+      const segmentAngle = 360 / options.length;
       const randomSegment = Math.floor(Math.random() * options.length);
-      const newRotation = (spins * 2 * Math.PI) + (randomSegment * segmentAngle) + (segmentAngle / 2);
-      rotation += newRotation;
-
-      wheel.style.transform = `rotate(${rotation}rad)`;
+      const spins = Math.floor(Math.random() * 4) + 5;
+      const totalDeg = spins * 360 + (randomSegment * segmentAngle) + (segmentAngle / 2);
+      deg += totalDeg;
+      wheel.style.transform = `rotate(${deg}deg)`;
 
       setTimeout(() => {
         const index = options.length - 1 - randomSegment;
@@ -124,10 +102,7 @@
         copyBtn.style.display = result.code !== "--" ? "inline-block" : "none";
         copyBtn.onclick = () => navigator.clipboard.writeText(result.code);
       }, 5200);
-    }
-
-    drawWheel();
-    spinBtn.addEventListener("click", spinWheel);
+    });
   </script>
 </body>
 </html>
