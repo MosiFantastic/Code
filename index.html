@@ -2,63 +2,57 @@
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>گردونه شانس</title>
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn&display=swap" rel="stylesheet">
   <style>
     body {
       background: #000;
       color: #fff;
       font-family: 'Vazirmatn', sans-serif;
       text-align: center;
-      padding-top: 50px;
+      padding: 20px;
     }
-    h1 {
-      font-size: 28px;
-      color: #ff9800;
-      margin-bottom: 20px;
-    }
-    #resultText {
-      font-size: 22px;
-      margin-top: 30px;
+    .wheel-container {
+      position: relative;
+      width: 100%;
+      max-width: 350px;
+      margin: auto;
     }
     canvas {
+      width: 100% !important;
+      height: auto !important;
       border-radius: 50%;
-      border: 10px solid #ff9800;
+      border: 8px solid #ff9800;
       background-color: #111;
     }
     .pointer {
       width: 0;
       height: 0;
-      border-left: 20px solid transparent;
-      border-right: 20px solid transparent;
-      border-bottom: 40px solid #ff9800;
+      border-left: 16px solid transparent;
+      border-right: 16px solid transparent;
+      border-bottom: 32px solid #ff9800;
       position: absolute;
-      top: -40px;
-      left: calc(50% - 20px);
-    }
-    .wheel-container {
-      position: relative;
-      width: 400px;
-      height: 400px;
-      margin: auto;
+      top: -32px;
+      left: calc(50% - 16px);
     }
     #spin {
       background: #ff9800;
       border: none;
       color: white;
-      padding: 10px 30px;
-      font-size: 18px;
+      padding: 10px 24px;
+      font-size: 16px;
       cursor: pointer;
       border-radius: 8px;
       margin-top: 20px;
     }
     #codeBox {
       margin-top: 20px;
-      font-size: 24px;
+      font-size: 20px;
+      font-weight: bold;
     }
     #copyCode {
       display: none;
-      margin-top: 10px;
+      margin-top: 12px;
       padding: 10px 20px;
       background-color: #ff9800;
       color: white;
@@ -66,16 +60,25 @@
       border-radius: 6px;
       cursor: pointer;
     }
+    #remainingSpinsDisplay {
+      margin-top: 10px;
+      font-size: 16px;
+      color: #aaa;
+    }
   </style>
 </head>
 <body>
-  <h1>گردونه رو بچرخون و شانس خودتو امتحان کن!</h1>
+  <h1>گردونه شانس</h1>
+  <p>بچرخون و شانس خودتو امتحان کن!</p>
+
   <div class="wheel-container">
     <div class="pointer"></div>
-    <canvas id="wheel" width="400" height="400"></canvas>
+    <canvas id="wheel" width="350" height="350"></canvas>
   </div>
+
   <button id="spin">بچرخ!</button>
-  <div id="resultText"></div>
+  <div id="remainingSpinsDisplay">تعداد دفعات باقی‌مانده: 1</div>
+
   <div id="codeBox"></div>
   <button id="copyCode">کپی کد</button>
 
@@ -97,13 +100,14 @@
     const radius = canvas.width / 2;
     const spinBtn = document.getElementById("spin");
     const codeBox = document.getElementById("codeBox");
-    const resultText = document.getElementById("resultText");
     const copyBtn = document.getElementById("copyCode");
     const tickSound = document.getElementById("tickSound");
+    const spinCountText = document.getElementById("remainingSpinsDisplay");
 
     let angle = 0;
     let spinning = false;
     let lastSegment = -1;
+    let remainingSpins = 1;
 
     function drawWheel() {
       const anglePerSlice = 2 * Math.PI / options.length;
@@ -122,16 +126,23 @@
         ctx.rotate(startAngle + anglePerSlice / 2);
         ctx.textAlign = "right";
         ctx.fillStyle = "#fff";
-        ctx.font = "bold 16px sans-serif";
+        ctx.font = "bold 14px sans-serif";
         ctx.fillText(options[i].label, radius - 10, 5);
         ctx.restore();
       }
     }
 
     function spinWheel() {
-      if (spinning) return;
+      if (spinning || remainingSpins <= 0) return;
+
+      remainingSpins--;
+      spinCountText.textContent = `تعداد دفعات باقی‌مانده: ${remainingSpins}`;
+      if (remainingSpins <= 0) {
+        spinBtn.disabled = true;
+        spinBtn.textContent = "فرصت شما تمام شد";
+      }
+
       spinning = true;
-      resultText.textContent = "در حال چرخش...";
       const spins = Math.random() * 5 + 5;
       const totalAngle = spins * 360;
       const duration = 5000;
@@ -151,7 +162,10 @@
         ctx.restore();
 
         const degrees = angle % 360;
-        const segment = Math.floor((360 - degrees + (360 / options.length / 2)) % 360 / (360 / options.length));
+        const segmentAngle = 360 / options.length;
+        const adjustedDegrees = (degrees + segmentAngle / 2) % 360;
+        const segment = Math.floor(adjustedDegrees / segmentAngle);
+
         if (segment !== lastSegment) {
           tickSound.currentTime = 0;
           tickSound.play();
@@ -162,10 +176,14 @@
           requestAnimationFrame(animate);
         } else {
           const result = options[segment];
-          resultText.textContent = result.code !== "--" ? "تبریک! برنده شدی 🎉" : "ای بابا! شانس نیاوردی 😔";
-          codeBox.textContent = result.code !== "--" ? `کد تخفیف شما: ${result.code}` : "";
-          copyBtn.style.display = result.code !== "--" ? "inline-block" : "none";
-          copyBtn.onclick = () => navigator.clipboard.writeText(result.code);
+          if (result.code === "--") {
+            codeBox.textContent = "متاسفم! پوچ بود :(";
+            copyBtn.style.display = "none";
+          } else {
+            codeBox.textContent = `🎉 تبریک! کد تخفیف شما: ${result.code}`;
+            copyBtn.style.display = "inline-block";
+            copyBtn.onclick = () => navigator.clipboard.writeText(result.code);
+          }
           spinning = false;
         }
       }
