@@ -105,19 +105,7 @@
     </div>
 
     <script>
-        let spunToday = localStorage.getItem('spunToday');
-
-        if (spunToday) {
-            document.getElementById('message').innerText = "شما امروز قبلاً چرخوندید!";
-            document.getElementById('wheel').classList.add('disabled');
-        }
-
         function spinWheel() {
-            // اگر کاربر قبلاً چرخوند، اجازه چرخوندن نداره
-            if (localStorage.getItem('spunToday')) {
-                return;
-            }
-
             // چرخاندن چرخ (چرخش تصادفی)
             const randomDegree = Math.floor(Math.random() * 360) + 720; // حداقل دو بار چرخش
             const rewards = [
@@ -138,22 +126,7 @@
             setTimeout(function() {
                 document.getElementById('reward').innerHTML = `جایزه شما: ${randomReward}`;
             }, 4000); // بعد از 4 ثانیه که چرخش تموم شد، جایزه نمایش داده می‌شود
-
-            // ذخیره‌سازی وضعیت چرخاندن برای امروز
-            localStorage.setItem('spunToday', 'true');
-
-            // غیر فعال کردن چرخ برای امروز
-            document.getElementById('wheel').classList.add('disabled');
-            document.getElementById('message').innerText = "شما امروز قبلاً چرخوندید!";
         }
-
-        // ریست کردن وضعیت برای روز بعد (هر 24 ساعت)
-        setInterval(function() {
-            localStorage.removeItem('spunToday');
-            document.getElementById('wheel').classList.remove('disabled');
-            document.getElementById('reward').innerHTML = '';
-            document.getElementById('message').innerText = '';
-        }, 86400000); // 86400000 میلی‌ثانیه = 24 ساعت
     </script>
 
 </body>
