@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>چرخ شانس VIVA DIVA</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .wheel {
+            margin-top: 20px;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 10px 20px;
+            background-color: #ff9800;
+            border: none;
+            color: white;
+            border-radius: 5px;
+        }
+        .reward {
+            margin-top: 20px;
+            font-size: 24px;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>به VIVA DIVA خوش آمدی!</h1>
+    <p>کد تخفیف خودتو بگیر و جایزه ببر!</p>
+
+    <button class="wheel" onclick="spinWheel()">چرخوندن چرخ شانس</button>
+
+    <div id="reward" class="reward"></div>
+
+    <script>
+        function spinWheel() {
+            const rewards = [
+                "10% تخفیف",
+                "20% تخفیف",
+                "30% تخفیف",
+                "50% تخفیف",
+                "کد رایگان برای خرید بعدی",
+                "هیچ‌چیزی! دوباره تلاش کن!"
+            ];
+
+            const randomReward = rewards[Math.floor(Math.random() * rewards.length)];
+
+            document.getElementById("reward").innerHTML = `جایزه شما: ${randomReward}`;
+        }
+    </script>
+
+</body>
+</html>
