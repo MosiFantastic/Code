@@ -2,7 +2,6 @@
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>گردونه شانس</title>
   <style>
     body {
@@ -10,49 +9,46 @@
       color: #fff;
       font-family: 'Vazirmatn', sans-serif;
       text-align: center;
-      padding: 20px;
-    }
-    .wheel-container {
-      position: relative;
-      width: 100%;
-      max-width: 350px;
-      margin: auto;
+      padding-top: 50px;
     }
     canvas {
-      width: 100% !important;
-      height: auto !important;
       border-radius: 50%;
-      border: 8px solid #ff9800;
+      border: 10px solid #ff9800;
       background-color: #111;
     }
     .pointer {
       width: 0;
       height: 0;
-      border-left: 16px solid transparent;
-      border-right: 16px solid transparent;
-      border-bottom: 32px solid #ff9800;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 40px solid #ff9800;
       position: absolute;
-      top: -32px;
-      left: calc(50% - 16px);
+      top: -40px;
+      left: calc(50% - 20px);
+    }
+    .wheel-container {
+      position: relative;
+      width: 400px;
+      height: 400px;
+      margin: auto;
     }
     #spin {
       background: #ff9800;
       border: none;
       color: white;
-      padding: 10px 24px;
-      font-size: 16px;
+      padding: 10px 30px;
+      font-size: 18px;
       cursor: pointer;
       border-radius: 8px;
       margin-top: 20px;
     }
     #codeBox {
       margin-top: 20px;
-      font-size: 20px;
-      font-weight: bold;
+      font-size: 24px;
     }
     #copyCode {
       display: none;
-      margin-top: 12px;
+      margin-top: 10px;
       padding: 10px 20px;
       background-color: #ff9800;
       color: white;
@@ -60,29 +56,24 @@
       border-radius: 6px;
       cursor: pointer;
     }
-    #remainingSpinsDisplay {
+    #spinCount {
+      font-size: 18px;
       margin-top: 10px;
-      font-size: 16px;
-      color: #aaa;
+      color: #ff9800;
     }
   </style>
 </head>
 <body>
-  <h1>گردونه شانس</h1>
-  <p>بچرخون و شانس خودتو امتحان کن!</p>
-
   <div class="wheel-container">
     <div class="pointer"></div>
-    <canvas id="wheel" width="350" height="350"></canvas>
+    <canvas id="wheel" width="400" height="400"></canvas>
   </div>
-
+  <div id="spinCount">تعداد دفعات باقی‌مانده: 1</div>
   <button id="spin">بچرخ!</button>
-  <div id="remainingSpinsDisplay">تعداد دفعات باقی‌مانده: 1</div>
-
   <div id="codeBox"></div>
   <button id="copyCode">کپی کد</button>
 
-  <audio id="tickSound" src="https://dl4.fara-download.ir/audio/sound_effect/alarms/check/Check%20mark%20sound%20effect.mp3"></audio>
+  <audio id="tickSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_d35d5a11de.mp3?filename=click-124467.mp3"></audio>
 
   <script>
     const options = [
@@ -102,12 +93,22 @@
     const codeBox = document.getElementById("codeBox");
     const copyBtn = document.getElementById("copyCode");
     const tickSound = document.getElementById("tickSound");
-    const spinCountText = document.getElementById("remainingSpinsDisplay");
+    const spinCountText = document.getElementById("spinCount");
 
     let angle = 0;
     let spinning = false;
     let lastSegment = -1;
-    let remainingSpins = 1;
+
+    let today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+    let lastPlayedDate = localStorage.getItem("lastPlayedDate");
+    let remainingSpins = (today !== lastPlayedDate) ? 1 : 0; // اگر تاریخ امروز با تاریخ ذخیره شده متفاوت بود، یک فرصت بازی به کاربر داده می‌شود.
+
+    spinCountText.textContent = `تعداد دفعات باقی‌مانده: ${remainingSpins}`;
+
+    if (remainingSpins <= 0) {
+      spinBtn.disabled = true;
+      spinBtn.textContent = "فرصت شما تمام شد";
+    }
 
     function drawWheel() {
       const anglePerSlice = 2 * Math.PI / options.length;
@@ -126,7 +127,7 @@
         ctx.rotate(startAngle + anglePerSlice / 2);
         ctx.textAlign = "right";
         ctx.fillStyle = "#fff";
-        ctx.font = "bold 14px sans-serif";
+        ctx.font = "bold 16px sans-serif";
         ctx.fillText(options[i].label, radius - 10, 5);
         ctx.restore();
       }
@@ -136,7 +137,13 @@
       if (spinning || remainingSpins <= 0) return;
 
       remainingSpins--;
+      localStorage.setItem("remainingSpins", remainingSpins);
+
+      // ذخیره تاریخ امروز در localStorage
+      localStorage.setItem("lastPlayedDate", today);
+
       spinCountText.textContent = `تعداد دفعات باقی‌مانده: ${remainingSpins}`;
+
       if (remainingSpins <= 0) {
         spinBtn.disabled = true;
         spinBtn.textContent = "فرصت شما تمام شد";
@@ -162,10 +169,7 @@
         ctx.restore();
 
         const degrees = angle % 360;
-        const segmentAngle = 360 / options.length;
-        const adjustedDegrees = (degrees + segmentAngle / 2) % 360;
-        const segment = Math.floor(adjustedDegrees / segmentAngle);
-
+        const segment = Math.floor((360 - degrees + (360 / options.length / 2)) % 360 / (360 / options.length));
         if (segment !== lastSegment) {
           tickSound.currentTime = 0;
           tickSound.play();
@@ -176,14 +180,9 @@
           requestAnimationFrame(animate);
         } else {
           const result = options[segment];
-          if (result.code === "--") {
-            codeBox.textContent = "متاسفم! پوچ بود :(";
-            copyBtn.style.display = "none";
-          } else {
-            codeBox.textContent = `🎉 تبریک! کد تخفیف شما: ${result.code}`;
-            copyBtn.style.display = "inline-block";
-            copyBtn.onclick = () => navigator.clipboard.writeText(result.code);
-          }
+          codeBox.textContent = result.code !== "--" ? `کد تخفیف شما: ${result.code}` : "متاسفم! پوچ بود :(";
+          copyBtn.style.display = result.code !== "--" ? "inline-block" : "none";
+          copyBtn.onclick = () => navigator.clipboard.writeText(result.code);
           spinning = false;
         }
       }
@@ -191,7 +190,6 @@
       requestAnimationFrame(animate);
     }
 
-    drawWheel();
     spinBtn.addEventListener("click", spinWheel);
   </script>
 </body>
