@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>گردونه شانس</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn&display=swap" rel="stylesheet">
   <style>
     body {
       background: #000;
@@ -10,6 +11,15 @@
       font-family: 'Vazirmatn', sans-serif;
       text-align: center;
       padding-top: 50px;
+    }
+    h1 {
+      font-size: 28px;
+      color: #ff9800;
+      margin-bottom: 20px;
+    }
+    #resultText {
+      font-size: 22px;
+      margin-top: 30px;
     }
     canvas {
       border-radius: 50%;
@@ -59,11 +69,13 @@
   </style>
 </head>
 <body>
+  <h1>گردونه رو بچرخون و شانس خودتو امتحان کن!</h1>
   <div class="wheel-container">
     <div class="pointer"></div>
     <canvas id="wheel" width="400" height="400"></canvas>
   </div>
   <button id="spin">بچرخ!</button>
+  <div id="resultText"></div>
   <div id="codeBox"></div>
   <button id="copyCode">کپی کد</button>
 
@@ -85,6 +97,7 @@
     const radius = canvas.width / 2;
     const spinBtn = document.getElementById("spin");
     const codeBox = document.getElementById("codeBox");
+    const resultText = document.getElementById("resultText");
     const copyBtn = document.getElementById("copyCode");
     const tickSound = document.getElementById("tickSound");
 
@@ -118,6 +131,7 @@
     function spinWheel() {
       if (spinning) return;
       spinning = true;
+      resultText.textContent = "در حال چرخش...";
       const spins = Math.random() * 5 + 5;
       const totalAngle = spins * 360;
       const duration = 5000;
@@ -148,7 +162,8 @@
           requestAnimationFrame(animate);
         } else {
           const result = options[segment];
-          codeBox.textContent = result.code !== "--" ? `کد تخفیف شما: ${result.code}` : "متاسفم! پوچ بود :(";
+          resultText.textContent = result.code !== "--" ? "تبریک! برنده شدی 🎉" : "ای بابا! شانس نیاوردی 😔";
+          codeBox.textContent = result.code !== "--" ? `کد تخفیف شما: ${result.code}` : "";
           copyBtn.style.display = result.code !== "--" ? "inline-block" : "none";
           copyBtn.onclick = () => navigator.clipboard.writeText(result.code);
           spinning = false;
