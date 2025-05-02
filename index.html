@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>گردونه شانس</title>
   <style>
     body {
@@ -114,7 +114,6 @@
     let remainingSpins = (today !== lastPlayedDate) ? 1 : 0;
 
     spinCountText.textContent = `تعداد دفعات باقی‌مانده: ${remainingSpins}`;
-
     if (remainingSpins <= 0) {
       spinBtn.disabled = true;
       spinBtn.textContent = "فرصت شما تمام شد";
@@ -148,11 +147,9 @@
 
       remainingSpins--;
       localStorage.setItem("remainingSpins", remainingSpins);
-
       localStorage.setItem("lastPlayedDate", today);
 
       spinCountText.textContent = `تعداد دفعات باقی‌مانده: ${remainingSpins}`;
-
       if (remainingSpins <= 0) {
         spinBtn.disabled = true;
         spinBtn.textContent = "فرصت شما تمام شد";
@@ -177,8 +174,10 @@
         drawWheel();
         ctx.restore();
 
-        const degrees = angle % 360;
-        const segment = Math.floor((360 - degrees + (360 / options.length / 2)) % 360 / (360 / options.length));
+        const correctedAngle = (360 - (angle % 360) + 90) % 360;
+        const segmentAngle = 360 / options.length;
+        const segment = Math.floor(correctedAngle / segmentAngle);
+
         if (segment !== lastSegment) {
           tickSound.currentTime = 0;
           tickSound.play();
@@ -189,7 +188,9 @@
           requestAnimationFrame(animate);
         } else {
           const result = options[segment];
-          codeBox.textContent = result.code !== "--" ? `کد تخفیف شما: ${result.code}` : "متاسفم! پوچ بود :(";
+          codeBox.textContent = result.code !== "--"
+            ? `کد تخفیف شما: ${result.code}`
+            : "متاسفم! پوچ بود :(";
           copyBtn.style.display = result.code !== "--" ? "inline-block" : "none";
           copyBtn.onclick = () => navigator.clipboard.writeText(result.code);
           spinning = false;
@@ -199,6 +200,7 @@
       requestAnimationFrame(animate);
     }
 
+    drawWheel();
     spinBtn.addEventListener("click", spinWheel);
   </script>
 </body>
