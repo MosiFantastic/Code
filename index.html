@@ -18,10 +18,10 @@
     }
     .wheel-container {
       position: relative;
-      width: 80vw; /* 80% از عرض صفحه */
-      height: 80vw; /* 80% از عرض صفحه */
-      max-width: 400px; /* حداقل عرض */
-      max-height: 400px; /* حداقل ارتفاع */
+      width: 80vw;
+      height: 80vw;
+      max-width: 400px;
+      max-height: 400px;
       margin: auto;
     }
     canvas {
@@ -109,9 +109,9 @@
     let spinning = false;
     let lastSegment = -1;
 
-    let today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+    let today = new Date().toISOString().split("T")[0];
     let lastPlayedDate = localStorage.getItem("lastPlayedDate");
-    let remainingSpins = (today !== lastPlayedDate) ? 1 : 0; // اگر تاریخ امروز با تاریخ ذخیره شده متفاوت بود، یک فرصت بازی به کاربر داده می‌شود.
+    let remainingSpins = (today !== lastPlayedDate) ? 1 : 0;
 
     spinCountText.textContent = `تعداد دفعات باقی‌مانده: ${remainingSpins}`;
 
@@ -149,7 +149,6 @@
       remainingSpins--;
       localStorage.setItem("remainingSpins", remainingSpins);
 
-      // ذخیره تاریخ امروز در localStorage
       localStorage.setItem("lastPlayedDate", today);
 
       spinCountText.textContent = `تعداد دفعات باقی‌مانده: ${remainingSpins}`;
