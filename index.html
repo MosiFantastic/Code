@@ -174,7 +174,7 @@
         drawWheel();
         ctx.restore();
 
-        const correctedAngle = (360 - (angle % 360) - 30) % 360;
+        const correctedAngle = (360 - (angle % 360) - 60) % 360;
         const segmentAngle = 360 / options.length;
         const segment = Math.floor(correctedAngle / segmentAngle);
 
