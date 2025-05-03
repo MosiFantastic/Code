@@ -40,6 +40,7 @@
       position: absolute;
       top: -5vh;
       left: calc(50% - 2vw);
+      z-index: 10;
     }
     #spin {
       background: #ff9800;
@@ -69,6 +70,16 @@
       font-size: 3vw;
       margin-top: 2vh;
       color: #ff9800;
+    }
+
+    @keyframes tick {
+      0% { transform: rotate(0deg); }
+      50% { transform: rotate(10deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    .pointer.shake {
+      animation: tick 0.2s ease;
     }
   </style>
 </head>
@@ -174,13 +185,17 @@
         drawWheel();
         ctx.restore();
 
-        const correctedAngle = (360 - (angle % 360) - 60) % 360;
+        const correctedAngle = (360 - (angle % 360)) % 360;
         const segmentAngle = 360 / options.length;
         const segment = Math.floor(correctedAngle / segmentAngle);
 
         if (segment !== lastSegment) {
           tickSound.currentTime = 0;
           tickSound.play();
+          document.querySelector('.pointer').classList.add('shake');
+          setTimeout(() => {
+            document.querySelector('.pointer').classList.remove('shake');
+          }, 200);
           lastSegment = segment;
         }
 
