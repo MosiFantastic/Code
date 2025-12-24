@@ -3,220 +3,996 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>گردونه شانس</title>
+  <title>گردونه شانس حرفه‌ای | Professional Fortune Wheel</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vazirmatn@33.003/font.css">
   <style>
+    :root {
+      --primary: #ff9800;
+      --primary-dark: #f57c00;
+      --secondary: #2196f3;
+      --success: #4caf50;
+      --danger: #f44336;
+      --dark: #121212;
+      --darker: #0a0a0a;
+      --light: #f5f5f5;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      background: #000;
-      color: #fff;
-      font-family: 'Vazirmatn', sans-serif;
+      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+      color: var(--light);
+      font-family: 'Vazirmatn', 'Segoe UI', Tahoma, sans-serif;
       text-align: center;
-      padding-top: 5vh;
+      min-height: 100vh;
+      padding: 20px;
+      overflow-x: hidden;
     }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      margin-bottom: 30px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
     h1 {
-      font-size: 5vw;
-      color: #ff9800;
+      font-size: clamp(28px, 5vw, 42px);
+      color: var(--primary);
+      text-shadow: 0 0 20px rgba(255, 152, 0, 0.3);
+      margin-bottom: 10px;
     }
+
+    .subtitle {
+      color: #aaa;
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    @media (min-width: 992px) {
+      .main-content {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .wheel-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
     .wheel-container {
       position: relative;
-      width: 80vw;
-      height: 80vw;
-      max-width: 400px;
-      max-height: 400px;
-      margin: auto;
+      width: 90vw;
+      height: 90vw;
+      max-width: 450px;
+      max-height: 450px;
+      margin: 20px auto;
     }
-    canvas {
-      border-radius: 50%;
-      border: 10px solid #ff9800;
-      background-color: #111;
+
+    .wheel-canvas {
       width: 100%;
       height: 100%;
+      border-radius: 50%;
+      border: 15px solid var(--primary);
+      background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+      box-shadow: 
+        0 0 50px rgba(255, 152, 0, 0.2),
+        inset 0 0 30px rgba(0, 0, 0, 0.8);
+      transition: transform 0.3s ease;
     }
+
+    .wheel-canvas:hover {
+      transform: scale(1.02);
+    }
+
     .pointer {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
       width: 0;
       height: 0;
-      border-left: 2vw solid transparent;
-      border-right: 2vw solid transparent;
-      border-bottom: 5vh solid #ff9800;
-      position: absolute;
-      top: -5vh;
-      left: calc(50% - 2vw);
+      border-left: 25px solid transparent;
+      border-right: 25px solid transparent;
+      border-top: 40px solid var(--primary);
+      filter: drop-shadow(0 0 10px rgba(255, 152, 0, 0.5));
       z-index: 10;
     }
-    #spin {
-      background: #ff9800;
+
+    .pointer::after {
+      content: '';
+      position: absolute;
+      top: -40px;
+      left: -10px;
+      width: 20px;
+      height: 20px;
+      background: var(--primary);
+      border-radius: 50%;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 30px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .btn {
+      padding: 18px 30px;
+      font-size: 20px;
+      font-weight: bold;
       border: none;
-      color: white;
-      padding: 1.5vh 5vw;
-      font-size: 3vw;
+      border-radius: 12px;
       cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Vazirmatn', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-spin {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      box-shadow: 0 10px 20px rgba(255, 152, 0, 0.3);
+    }
+
+    .btn-spin:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(255, 152, 0, 0.4);
+    }
+
+    .btn-spin:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    .btn-spin:disabled {
+      background: #666;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    .btn-test {
+      background: rgba(33, 150, 243, 0.1);
+      color: var(--secondary);
+      border: 2px solid var(--secondary);
+    }
+
+    .btn-test:hover {
+      background: rgba(33, 150, 243, 0.2);
+    }
+
+    .btn-copy {
+      background: var(--success);
+      color: white;
+      margin-top: 10px;
+    }
+
+    .info-section {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      padding: 25px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .info-card {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .info-title {
+      color: var(--primary);
+      font-size: 20px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .info-value {
+      font-size: 32px;
+      font-weight: bold;
+      color: white;
+      margin: 10px 0;
+    }
+
+    .countdown {
+      font-size: 20px;
+      color: var(--secondary);
+      margin-top: 10px;
+    }
+
+    .history-list {
+      list-style: none;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      transition: background 0.3s;
+    }
+
+    .history-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .history-date {
+      color: #aaa;
+    }
+
+    .history-result {
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    .result-section {
+      margin-top: 30px;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .result-box {
+      background: linear-gradient(135deg, rgba(255, 152, 0, 0.1), rgba(33, 150, 243, 0.1));
+      border-radius: 15px;
+      padding: 30px;
+      border: 2px solid rgba(255, 152, 0, 0.3);
+      margin-bottom: 20px;
+    }
+
+    .result-title {
+      font-size: 24px;
+      color: var(--primary);
+      margin-bottom: 15px;
+    }
+
+    .result-code {
+      font-size: 48px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 0 0 20px rgba(255, 152, 0, 0.5);
+      letter-spacing: 5px;
+      margin: 20px 0;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      border: 2px dashed var(--primary);
+    }
+
+    .result-empty {
+      color: #ff6b6b;
+      font-size: 28px;
+    }
+
+    .admin-panel {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 20px;
+      padding: 25px;
+      margin-top: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .admin-title {
+      color: var(--secondary);
+      font-size: 22px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .admin-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+    }
+
+    .admin-input {
+      padding: 12px;
       border-radius: 8px;
-      margin-top: 4vh;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(0, 0, 0, 0.3);
+      color: white;
+      font-family: 'Vazirmatn', sans-serif;
+      width: 100%;
     }
-    #codeBox {
-      margin-top: 5vh;
-      font-size: 5vw;
-    }
-    #copyCode {
-      display: none;
-      margin-top: 2vh;
-      padding: 2vh 5vw;
-      background-color: #ff9800;
+
+    .admin-btn {
+      padding: 12px;
+      background: var(--secondary);
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
-    }
-    #spinCount {
-      font-size: 3vw;
-      margin-top: 2vh;
-      color: #ff9800;
+      font-family: 'Vazirmatn', sans-serif;
+      transition: background 0.3s;
     }
 
-    @keyframes tick {
+    .admin-btn:hover {
+      background: #1976d2;
+    }
+
+    .spins-info {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+
+    .spin-counter {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 15px 25px;
+      border-radius: 12px;
+      min-width: 200px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes spin {
       0% { transform: rotate(0deg); }
-      50% { transform: rotate(10deg); }
-      100% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
-    .pointer.shake {
-      animation: tick 0.2s ease;
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+
+    .bounce {
+      animation: bounce 1s infinite;
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--success);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      animation: fadeIn 0.3s ease;
+      display: none;
+    }
+
+    .icon {
+      font-size: 24px;
+    }
+
+    footer {
+      margin-top: 50px;
+      color: #666;
+      font-size: 14px;
+      padding: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-dark);
     }
   </style>
 </head>
 <body>
-  <h1>گردونه شانس</h1>
-  <div class="wheel-container">
-    <div class="pointer"></div>
-    <canvas id="wheel" width="400" height="400"></canvas>
-  </div>
-  <div id="spinCount">تعداد دفعات باقی‌مانده: 1</div>
-  <button id="spin">مهلت تمام شده!</button>
-  <div id="codeBox"></div>
-  <button id="copyCode">کپی کد</button>
+  <div class="container">
+    <header>
+      <h1>🎯 گردونه شانس حرفه‌ای</h1>
+      <p class="subtitle">شانس خود را برای دریافت تخفیف‌های ویژه امتحان کنید!</p>
+    </header>
 
-  <audio id="tickSound" src="https://v.delgarm.com/mp3/835/2022/10/07/634091119e44c.mp3"></audio>
+    <main class="main-content">
+      <!-- بخش گردونه -->
+      <section class="wheel-section">
+        <div class="wheel-container">
+          <div class="pointer"></div>
+          <canvas class="wheel-canvas" id="wheelCanvas" width="500" height="500"></canvas>
+        </div>
+
+        <div class="spins-info">
+          <div class="spin-counter">
+            <div class="info-title">🎯 تعداد اسپین باقی‌مانده</div>
+            <div class="info-value" id="remainingSpins">1</div>
+          </div>
+          <div class="spin-counter">
+            <div class="info-title">⏳ زمان تا اسپین بعدی</div>
+            <div class="countdown" id="countdown">--:--:--</div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button class="btn btn-spin" id="spinBtn">
+            <span class="icon">🎰</span>
+            <span>چرخاندن گردونه</span>
+          </button>
+          <button class="btn btn-test" id="testBtn">
+            <span class="icon">🔧</span>
+            <span>تست گردونه (بدون کسر)</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- بخش اطلاعات و نتایج -->
+      <section class="info-section">
+        <div class="info-card">
+          <div class="info-title">🏆 آخرین جایزه</div>
+          <div id="lastPrize" class="info-value">هنوز گردونه نچرخانده‌اید</div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-title">📊 تاریخچه گردونه</div>
+          <ul class="history-list" id="historyList">
+            <!-- تاریخچه به صورت پویا پر می‌شود -->
+          </ul>
+        </div>
+
+        <div class="result-section" id="resultSection" style="display: none;">
+          <div class="result-box">
+            <div class="result-title">🎉 نتیجه گردونه</div>
+            <div id="resultText" class="result-code"></div>
+            <button class="btn btn-copy" id="copyBtn">
+              <span class="icon">📋</span>
+              <span>کپی کد تخفیف</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- پنل مدیریت (برای تنظیمات) -->
+    <section class="admin-panel">
+      <div class="admin-title">⚙️ تنظیمات گردونه</div>
+      <div class="admin-controls">
+        <select id="soundSelect" class="admin-input">
+          <option value="on">🔊 صدا فعال</option>
+          <option value="off">🔇 صدا غیرفعال</option>
+        </select>
+        <button class="admin-btn" id="resetBtn">🔄 بازنشانی اسپین‌ها</button>
+        <button class="admin-btn" id="clearHistoryBtn">🗑️ پاک کردن تاریخچه</button>
+      </div>
+    </section>
+
+    <footer>
+      <p>© 2023 گردونه شانس حرفه‌ای | طراحی شده با ❤️ برای کاربران فارسی زبان</p>
+      <p>این پروژه صرفاً جنبه نمایشی دارد</p>
+    </footer>
+  </div>
+
+  <!-- نوتیفیکیشن -->
+  <div class="notification" id="notification"></div>
+
+  <!-- صداها -->
+  <audio id="spinSound" preload="auto">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-spinning-wheel-909.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="winSound" preload="auto">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="clickSound" preload="auto">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="tickSound" preload="auto">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-unlock-game-notification-253.mp3" type="audio/mpeg">
+  </audio>
 
   <script>
-    const options = [
-      { label: "تخفیف 6٪", code: "9771", color: "#ff9800" },
-      { label: "تخفیف 8٪", code: "5706", color: "#4caf50" },
-      { label: "تخفیف 15٪", code: "8289", color: "#2196f3" },
-      { label: "تخفیف 25٪", code: "6581", color: "#f44336" },
-      { label: "تخفیف 30٪", code: "2276", color: "#9c27b0" },
-      { label: "تخفیف 45٪", code: "4711", color: "#00bcd4" },
-      { label: "پوچ", code: "--", color: "#777" }
-    ];
+    // تنظیمات گردونه
+    const WHEEL_CONFIG = {
+      segments: [
+        { label: "تخفیف 6٪", code: "FORTUNE6", color: "#ff9800", probability: 25 },
+        { label: "تخفیف 8٪", code: "LUCKY8", color: "#4caf50", probability: 20 },
+        { label: "تخفیف 15٪", code: "WINNER15", color: "#2196f3", probability: 15 },
+        { label: "تخفیف 25٪", code: "MEGA25", color: "#f44336", probability: 10 },
+        { label: "تخفیف 30٪", code: "SUPER30", color: "#9c27b0", probability: 8 },
+        { label: "تخفیف 45٪", code: "EPIC45", color: "#00bcd4", probability: 5 },
+        { label: "شارژ رایگان", code: "FREE100", color: "#ffeb3b", probability: 5 },
+        { label: "پوچ", code: "NO_PRIZE", color: "#777777", probability: 12 }
+      ],
+      spinDuration: 5000, // مدت چرخش به میلی‌ثانیه
+      dailySpins: 1, // تعداد اسپین روزانه
+      testModeEnabled: true // امکان تست گردونه
+    };
 
-    const canvas = document.getElementById("wheel");
-    const ctx = canvas.getContext("2d");
-    const radius = canvas.width / 2;
-    const spinBtn = document.getElementById("spin");
-    const codeBox = document.getElementById("codeBox");
-    const copyBtn = document.getElementById("copyCode");
-    const tickSound = document.getElementById("tickSound");
-    const spinCountText = document.getElementById("spinCount");
+    // متغیرهای سراسری
+    let canvas, ctx;
+    let currentAngle = 0;
+    let isSpinning = false;
+    let isTestMode = false;
+    let remainingSpins = 0;
+    let nextSpinTime = null;
+    let soundEnabled = true;
 
-    let angle = 0;
-    let spinning = false;
-    let lastSegment = -1;
+    // المان‌های DOM
+    const elements = {
+      wheelCanvas: document.getElementById('wheelCanvas'),
+      spinBtn: document.getElementById('spinBtn'),
+      testBtn: document.getElementById('testBtn'),
+      copyBtn: document.getElementById('copyBtn'),
+      remainingSpins: document.getElementById('remainingSpins'),
+      countdown: document.getElementById('countdown'),
+      lastPrize: document.getElementById('lastPrize'),
+      historyList: document.getElementById('historyList'),
+      resultSection: document.getElementById('resultSection'),
+      resultText: document.getElementById('resultText'),
+      notification: document.getElementById('notification'),
+      soundSelect: document.getElementById('soundSelect'),
+      resetBtn: document.getElementById('resetBtn'),
+      clearHistoryBtn: document.getElementById('clearHistoryBtn')
+    };
 
-    let today = new Date().toISOString().split("T")[0];
-    let lastPlayedDate = localStorage.getItem("lastPlayedDate");
-    let remainingSpins = (today !== lastPlayedDate) ? 1 : 0;
+    // صداها
+    const sounds = {
+      spin: document.getElementById('spinSound'),
+      win: document.getElementById('winSound'),
+      click: document.getElementById('clickSound'),
+      tick: document.getElementById('tickSound')
+    };
 
-    spinCountText.textContent = `تعداد دفعات باقی‌مانده: ${remainingSpins}`;
-    if (remainingSpins <= 0) {
-      spinBtn.disabled = true;
-      spinBtn.textContent = "فرصت شما تمام شد";
+    // تاریخچه گردونه
+    let spinHistory = [];
+
+    // مقداردهی اولیه
+    function init() {
+      canvas = elements.wheelCanvas;
+      ctx = canvas.getContext('2d');
+      
+      // بارگذاری داده‌های ذخیره شده
+      loadSavedData();
+      
+      // ترسیم اولیه گردونه
+      drawWheel();
+      
+      // تنظیم رویدادها
+      setupEventListeners();
+      
+      // به‌روزرسانی وضعیت
+      updateUI();
+      
+      // شروع شمارش معکوس
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
     }
 
-    function drawWheel() {
-      const anglePerSlice = 2 * Math.PI / options.length;
-      for (let i = 0; i < options.length; i++) {
-        const startAngle = i * anglePerSlice;
-        const endAngle = startAngle + anglePerSlice;
-
-        ctx.beginPath();
-        ctx.moveTo(radius, radius);
-        ctx.arc(radius, radius, radius, startAngle, endAngle);
-        ctx.fillStyle = options[i].color;
-        ctx.fill();
-
-        ctx.save();
-        ctx.translate(radius, radius);
-        ctx.rotate(startAngle + anglePerSlice / 2);
-        ctx.textAlign = "right";
-        ctx.fillStyle = "#fff";
-        ctx.font = "bold 16px sans-serif";
-        ctx.fillText(options[i].label, radius - 10, 5);
-        ctx.restore();
+    // بارگذاری داده‌های ذخیره شده
+    function loadSavedData() {
+      // بارگذاری تاریخچه
+      const savedHistory = localStorage.getItem('fortuneWheelHistory');
+      if (savedHistory) {
+        spinHistory = JSON.parse(savedHistory);
+        updateHistoryDisplay();
       }
+      
+      // بارگذاری آخرین جایزه
+      const lastPrize = localStorage.getItem('fortuneWheelLastPrize');
+      if (lastPrize) {
+        elements.lastPrize.textContent = lastPrize;
+      }
+      
+      // بارگذاری تنظیمات صدا
+      const savedSoundSetting = localStorage.getItem('fortuneWheelSound');
+      soundEnabled = savedSoundSetting !== 'off';
+      elements.soundSelect.value = soundEnabled ? 'on' : 'off';
+      
+      // محاسبه اسپین‌های باقی‌مانده
+      calculateRemainingSpins();
     }
 
-    function spinWheel() {
-      if (spinning || remainingSpins <= 0) return;
-
-      remainingSpins--;
-      localStorage.setItem("remainingSpins", remainingSpins);
-      localStorage.setItem("lastPlayedDate", today);
-
-      spinCountText.textContent = `تعداد دفعات باقی‌مانده: ${remainingSpins}`;
+    // محاسبه اسپین‌های باقی‌مانده
+    function calculateRemainingSpins() {
+      const today = new Date().toDateString();
+      const lastSpinDate = localStorage.getItem('fortuneWheelLastSpinDate');
+      
+      if (lastSpinDate === today) {
+        const usedSpins = parseInt(localStorage.getItem('fortuneWheelUsedSpins') || '0');
+        remainingSpins = Math.max(0, WHEEL_CONFIG.dailySpins - usedSpins);
+      } else {
+        remainingSpins = WHEEL_CONFIG.dailySpins;
+        localStorage.setItem('fortuneWheelUsedSpins', '0');
+        localStorage.setItem('fortuneWheelLastSpinDate', today);
+      }
+      
+      elements.remainingSpins.textContent = remainingSpins;
+      elements.spinBtn.disabled = remainingSpins <= 0;
+      
       if (remainingSpins <= 0) {
-        spinBtn.disabled = true;
-        spinBtn.textContent = "فرصت شما تمام شد";
+        elements.spinBtn.innerHTML = '<span class="icon">⏳</span><span>فرصت امروز تمام شد</span>';
+        calculateNextSpinTime();
       }
+    }
 
-      spinning = true;
-      const spins = Math.random() * 5 + 5;
-      const totalAngle = spins * 360;
-      const duration = 5000;
-      const start = performance.now();
+    // محاسبه زمان اسپین بعدی
+    function calculateNextSpinTime() {
+      const now = new Date();
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(0, 0, 0, 0);
+      nextSpinTime = tomorrow.getTime();
+    }
 
-      function animate(time) {
-        const progress = Math.min((time - start) / duration, 1);
-        const easeOut = 1 - Math.pow(1 - progress, 3);
-        angle = easeOut * totalAngle;
+    // به‌روزرسانی شمارش معکوس
+    function updateCountdown() {
+      if (!nextSpinTime) return;
+      
+      const now = new Date().getTime();
+      const timeLeft = nextSpinTime - now;
+      
+      if (timeLeft <= 0) {
+        elements.countdown.textContent = 'همین حالا!';
+        calculateRemainingSpins();
+        return;
+      }
+      
+      const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+      
+      elements.countdown.textContent = 
+        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // ترسیم گردونه
+    function drawWheel(angle = 0) {
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = Math.min(centerX, centerY) - 20;
+      
+      // پاک کردن کانواس
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // اعمال چرخش
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.rotate(angle * Math.PI / 180);
+      ctx.translate(-centerX, -centerY);
+      
+      // ترسیم بخش‌ها
+      const totalSegments = WHEEL_CONFIG.segments.length;
+      const segmentAngle = 2 * Math.PI / totalSegments;
+      
+      for (let i = 0; i < totalSegments; i++) {
+        const segment = WHEEL_CONFIG.segments[i];
+        const startAngle = i * segmentAngle;
+        const endAngle = startAngle + segmentAngle;
+        
+        // ترسیم قطاع
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+        ctx.closePath();
+        
+        // رنگ‌آمیزی
+        ctx.fillStyle = segment.color;
+        ctx.fill();
+        
+        // حاشیه
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        // متن
         ctx.save();
-        ctx.translate(radius, radius);
-        ctx.rotate(angle * Math.PI / 180);
-        ctx.translate(-radius, -radius);
-        drawWheel();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(startAngle + segmentAngle / 2);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 16px Vazirmatn';
+        ctx.fillText(segment.label, radius - 30, 5);
         ctx.restore();
+      }
+      
+      // دکوراسیون مرکز
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, 20, 0, 2 * Math.PI);
+      ctx.fillStyle = '#121212';
+      ctx.fill();
+      ctx.strokeStyle = '#ff9800';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+      
+      ctx.restore();
+    }
 
-        const correctedAngle = (360 - (angle % 360)) % 360;
-        const segmentAngle = 360 / options.length;
-        const segment = Math.floor(correctedAngle / segmentAngle);
-
-        if (segment !== lastSegment) {
-          tickSound.currentTime = 0;
-          tickSound.play();
-          document.querySelector('.pointer').classList.add('shake');
-          setTimeout(() => {
-            document.querySelector('.pointer').classList.remove('shake');
-          }, 200);
-          lastSegment = segment;
-        }
-
+    // چرخاندن گردونه
+    function spinWheel(isTest = false) {
+      if (isSpinning) return;
+      
+      isTestMode = isTest;
+      isSpinning = true;
+      playSound(sounds.click);
+      
+      // انیمیشن گردونه
+      const spins = 5 + Math.random() * 3; // 5-8 دور چرخش
+      const targetAngle = spins * 360 + getRandomSegmentAngle();
+      const startTime = Date.now();
+      const duration = WHEEL_CONFIG.spinDuration;
+      
+      // شروع صدا
+      if (!isTest && soundEnabled) {
+        sounds.spin.currentTime = 0;
+        sounds.spin.play();
+      }
+      
+      function animate() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // تابع easing برای چرخش نرم
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        currentAngle = easeOut * targetAngle;
+        
+        drawWheel(currentAngle);
+        
         if (progress < 1) {
           requestAnimationFrame(animate);
         } else {
-          const result = options[segment];
-          codeBox.textContent = result.code !== "--"
-            ? `کد تخفیف شما: ${result.code}`
-            : "متاسفم! پوچ بود :(";
-          copyBtn.style.display = result.code !== "--" ? "inline-block" : "none";
-          copyBtn.onclick = () => navigator.clipboard.writeText(result.code);
-          spinning = false;
+          finishSpin(targetAngle % 360);
         }
       }
-
-      requestAnimationFrame(animate);
+      
+      animate();
+      
+      // غیرفعال کردن دکمه‌ها در حین چرخش
+      elements.spinBtn.disabled = true;
+      elements.testBtn.disabled = true;
     }
 
-    drawWheel();
-    spinBtn.addEventListener("click", spinWheel);
+    // محاسبه زاویه بخش تصادفی با درنظرگیری احتمال
+    function getRandomSegmentAngle() {
+      const totalProbability = WHEEL_CONFIG.segments.reduce((sum, seg) => sum + seg.probability, 0);
+      let random = Math.random() * totalProbability;
+      
+      for (let i = 0; i < WHEEL_CONFIG.segments.length; i++) {
+        random -= WHEEL_CONFIG.segments[i].probability;
+        if (random <= 0) {
+          return (i * (360 / WHEEL_CONFIG.segments.length)) + (Math.random() * (360 / WHEEL_CONFIG.segments.length));
+        }
+      }
+      
+      return 0;
+    }
+
+    // پایان چرخش
+    function finishSpin(finalAngle) {
+      isSpinning = false;
+      
+      // محاسبه بخش برنده
+      const totalSegments = WHEEL_CONFIG.segments.length;
+      const segmentSize = 360 / totalSegments;
+      const normalizedAngle = (360 - (finalAngle % 360)) % 360;
+      const winningIndex = Math.floor(normalizedAngle / segmentSize);
+      const winningSegment = WHEEL_CONFIG.segments[winningIndex];
+      
+      // نمایش نتیجه
+      showResult(winningSegment);
+      
+      // ذخیره تاریخچه
+      if (!isTestMode) {
+        saveSpinResult(winningSegment);
+        updateRemainingSpins();
+      }
+      
+      // فعال‌سازی دکمه‌ها
+      elements.spinBtn.disabled = remainingSpins <= 0;
+      elements.testBtn.disabled = false;
+      
+      // پخش صدا
+      if (!isTestMode && soundEnabled) {
+        sounds.spin.pause();
+        if (winningSegment.code !== 'NO_PRIZE') {
+          playSound(sounds.win);
+        }
+      }
+    }
+
+    // نمایش نتیجه
+    function showResult(segment) {
+      elements.resultSection.style.display = 'block';
+      
+      if (segment.code === 'NO_PRIZE') {
+        elements.resultText.textContent = 'متاسفانه پوچ بود!';
+        elements.resultText.className = 'result-empty';
+        elements.copyBtn.style.display = 'none';
+      } else {
+        elements.resultText.textContent = segment.code;
+        elements.resultText.className = 'result-code';
+        elements.copyBtn.style.display = 'block';
+        
+        // پویانمایی برای کد برنده
+        elements.resultText.style.animation = 'pulse 1s 3';
+      }
+      
+      // اسکرول به نتیجه
+      elements.resultSection.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ذخیره نتیجه اسپین
+    function saveSpinResult(segment) {
+      const spinResult = {
+        date: new Date().toLocaleString('fa-IR'),
+        prize: segment.code === 'NO_PRIZE' ? 'پوچ' : segment.label,
+        code: segment.code,
+        isTest: isTestMode
+      };
+      
+      spinHistory.unshift(spinResult);
+      if (spinHistory.length > 10) spinHistory = spinHistory.slice(0, 10);
+      
+      localStorage.setItem('fortuneWheelHistory', JSON.stringify(spinHistory));
+      localStorage.setItem('fortuneWheelLastPrize', spinResult.prize);
+      
+      updateHistoryDisplay();
+    }
+
+    // به‌روزرسانی تاریخچه
+    function updateHistoryDisplay() {
+      elements.historyList.innerHTML = '';
+      
+      spinHistory.forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'history-item';
+        li.innerHTML = `
+          <span class="history-date">${item.date}</span>
+          <span class="history-result">${item.prize} ${item.isTest ? '(تست)' : ''}</span>
+        `;
+        elements.historyList.appendChild(li);
+      });
+      
+      if (spinHistory.length === 0) {
+        const li = document.createElement('li');
+        li.className = 'history-item';
+        li.textContent = 'تاریخچه‌ای وجود ندارد';
+        elements.historyList.appendChild(li);
+      }
+    }
+
+    // به‌روزرسانی اسپین‌های باقی‌مانده
+    function updateRemainingSpins() {
+      if (isTestMode) return;
+      
+      const today = new Date().toDateString();
+      const lastSpinDate = localStorage.getItem('fortuneWheelLastSpinDate');
+      
+      if (lastSpinDate === today) {
+        const usedSpins = parseInt(localStorage.getItem('fortuneWheelUsedSpins') || '0');
+        localStorage.setItem('fortuneWheelUsedSpins', (usedSpins + 1).toString());
+      } else {
+        localStorage.setItem('fortuneWheelLastSpinDate', today);
+        localStorage.setItem('fortuneWheelUsedSpins', '1');
+      }
+      
+      calculateRemainingSpins();
+    }
+
+    // پخش صدا
+    function playSound(sound) {
+      if (!soundEnabled) return;
+      
+      sound.currentTime = 0;
+      sound.play().catch(e => console.log('خطا در پخش صدا:', e));
+    }
+
+    // نمایش نوتیفیکیشن
+    function showNotification(message, type = 'success') {
+      const notification = elements.notification;
+      notification.textContent = message;
+      notification.style.background = type === 'success' ? '#4caf50' : '#f44336';
+      notification.style.display = 'block';
+      
+      setTimeout(() => {
+        notification.style.display = 'none';
+      }, 3000);
+    }
+
+    // تنظیم رویدادها
+    function setupEventListeners() {
+      // دکمه چرخاندن
+      elements.spinBtn.addEventListener('click', () => spinWheel(false));
+      
+      // دکمه تست
+      elements.testBtn.addEventListener('click', () => spinWheel(true));
+      
+      // دکمه کپی
+      elements.copyBtn.addEventListener('click', () => {
+        const code = elements.resultText.textContent;
+        navigator.clipboard.writeText(code).then(() => {
+          showNotification('کد با موفقیت کپی شد!', 'success');
+        });
+      });
+      
+      // تنظیمات صدا
+      elements.soundSelect.addEventListener('change', (e) => {
+        soundEnabled = e.target.value === 'on';
+        localStorage.setItem('fortuneWheelSound', soundEnabled ? 'on' : 'off');
+        showNotification(soundEnabled ? 'صدا فعال شد' : 'صدا غیرفعال شد', 'success');
+      });
+      
+      // بازنشانی اسپین‌ها
+      elements.resetBtn.addEventListener('click', () => {
+        localStorage.removeItem('fortuneWheelLastSpinDate');
+        localStorage.removeItem('fortuneWheelUsedSpins');
+        calculateRemainingSpins();
+        showNotification('اسپین‌ها با موفقیت بازنشانی شدند', 'success');
+      });
+      
+      // پاک کردن تاریخچه
+      elements.clearHistoryBtn.addEventListener('click', () => {
+        spinHistory = [];
+        localStorage.removeItem('fortuneWheelHistory');
+        updateHistoryDisplay();
+        showNotification('تاریخچه با موفقیت پاک شد', 'success');
+      });
+    }
+
+    // به‌روزرسانی UI
+    function updateUI() {
+      // به‌روزرسانی متن دکمه اسپین
+      if (remainingSpins > 0) {
+        elements.spinBtn.innerHTML = '<span class="icon">🎰</span><span>چرخاندن گردونه (' + remainingSpins + ' باقی‌مانده)</span>';
+      }
+      
+      // غیرفعال کردن دکمه تست اگر امکان تست وجود ندارد
+      elements.testBtn.disabled = !WHEEL_CONFIG.testModeEnabled;
+    }
+
+    // شروع برنامه
+    window.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
-</html>
+  </html>
